@@ -1,0 +1,8 @@
+services:
+  gcic-shiny:
+    build: .
+    ports:
+      - "3838:3838"
+    volumes:
+      - ./results:/srv/shiny-server/gcic/results
+    restart: unless-stopped

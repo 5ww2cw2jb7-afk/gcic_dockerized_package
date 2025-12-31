@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "GCIC Shiny App"
+type: software
+version: "1.0.0"
+authors:
+  - family-names: Ohmori
+    given-names: Yoshihiro
+    affiliation: Your Institution
+date-released: 2026-01-01
+license: GPL-3.0-or-later
+keywords:
+  - genomics
+  - regulatory elements
+  - Shiny
+  - reproducible research
+  - Docker
