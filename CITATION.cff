@@ -1,17 +1,20 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-title: "GCIC Shiny App"
-type: software
-version: "1.0.0"
+message: "If you use this software in your research, please cite it."
+
+title: "GCIC: Dockerized Shiny application for GCIC analysis"
+
 authors:
   - family-names: Ohmori
     given-names: Yoshihiro
-    affiliation: Your Institution
-date-released: 2026-01-01
-license: GPL-3.0-or-later
-keywords:
-  - genomics
-  - regulatory elements
-  - Shiny
-  - reproducible research
-  - Docker
+
+version: "1.0.0"
+date-released: 2025-12-31
+
+repository-code: "https://github.com/5ww2cw2jb7-afk/gcic_dockerized_package"
+
+license: MIT
+
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.18111654"
+    description: "Input FASTA and BED files for GCIC analysis"
