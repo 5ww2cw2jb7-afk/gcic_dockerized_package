@@ -60,21 +60,31 @@ http://localhost:3838/gcic/
 
 ## Data Files
 
-Required input files (example):
+This repository does not include large input data files.
+
+Required input FASTA and BED files (examples):
 
 - gene_regions.5prime.fa
 - gene_regions.bed
 - ATgene_regions.5prime.fa
 - ATgene_regions.bed
-- resources/
-- analysis/
 
-These files must be placed in the repository root directory.
+Please download these files from Zenodo (see below) and place them in the
+repository root directory before running the application.
+
+---
+
+## Input data (FASTA/BED)
+
+The FASTA and BED files required to run this application are available on Zenodo:
+
+https://doi.org/10.5281/zenodo.18111654
 
 ---
 
 ## License
-Specify your license here (e.g., GPL-3.0-or-later).
+
+This software is released under the MIT License.
 
 ---
 
