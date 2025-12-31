@@ -1,0 +1,12 @@
+# outputs
+results/
+*.log
+
+# large data (reference genomes / annotations)
+*.fa
+*.fasta
+*.fai
+*.bed
+
+# OS / editor
+.DS_Store
