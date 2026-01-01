@@ -21,6 +21,8 @@ reproducibility across operating systems.
 - Docker Desktop (macOS / Windows)  
   or Docker Engine (Linux)
 
+Docker Desktop must be running before executing the commands below.
+
 ### Build and Run
 
 ```bash
