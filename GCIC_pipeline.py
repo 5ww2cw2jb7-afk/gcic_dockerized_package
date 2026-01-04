@@ -63,6 +63,14 @@ def resolve_if_relative(p: str, base: Path) -> str:
     return str((Path.cwd() / pp).resolve())
 
 
+def _parse_family_tokens(fam_value) -> list[str]:
+    """Comma-separated family string -> cleaned list of tokens."""
+    if pd.isna(fam_value):
+        return []
+    toks = [x.strip() for x in str(fam_value).split(",")]
+    return [t for t in toks if t != ""]
+
+
 def main(args):
     pkg_root = Path(__file__).resolve().parent
     analysis_dir = pkg_root / "analysis"
@@ -146,7 +154,7 @@ def main(args):
             df["end"] = df["end"].astype(int)
             df["family"] = df["family"].astype(str)
 
-            # 同じ区間をまとめる
+            # 同じ区間をまとめる（FASTAのヘッダ用にユニーク集合を表示）
             groups = (
                 df.groupby(["start", "end"])["family"]
                   .apply(lambda s: ",".join(sorted(set(",".join(s).split(",")))))
@@ -170,18 +178,29 @@ def main(args):
                         out.write(island_seq[j:j+60] + "\n")
 
     # ④ per-gene summary（互換：gene_gcic_summary.tsv）
-    families = set()
+    # ---- イネと同じ定義に戻す ----
+    # gcic_motif_family_count = family の総数（重複込み：usage）
+    # family_count            = family の種類数（ユニーク：diversity）
+    families_set = set()
+    total_occ = 0
     total_bp = 0
+
     if os.path.exists(multi_tsv) and os.path.getsize(multi_tsv) > 0:
         df = pd.read_csv(multi_tsv, sep="\t")
         if all(c in df.columns for c in ["start", "end", "family"]):
+            # island 単位（start,end）でまとめて bp と family を集計
             for (s, e), sub in df.groupby(["start", "end"]):
                 s, e = int(s), int(e)
                 total_bp += max(0, e - s)
-                fams = ",".join(sub["family"].astype(str)).split(",")
-                families.update([x for x in fams if x])
 
-    has_gcic = len(families) > 0
+                # sub["family"] には複数行があり得るので、行ごとにトークン化して合算
+                for fam in sub["family"]:
+                    toks = _parse_family_tokens(fam)
+                    total_occ += len(toks)        # ★重複込み（usage）
+                    families_set.update(toks)     # ★ユニーク集合（diversity）
+
+    has_gcic = (total_occ > 0) or (len(families_set) > 0)
+
     out_summary = os.path.join(args.outdir, "gene_gcic_summary.tsv")
     summary = {
         "gene_id": args.gene_id,
@@ -189,9 +208,18 @@ def main(args):
         "region_start": args.start,
         "region_end": args.end,
         "has_gcic": has_gcic,
-        "gcic_motif_family_count": len(families),
-        "gcic_total_bp": total_bp,
-        "family_set": ",".join(sorted(families))
+
+        # ★イネ定義：重複込み総数（usage）
+        "gcic_motif_family_count": int(total_occ),
+
+        # 合計長（現行踏襲）
+        "gcic_total_bp": int(total_bp),
+
+        # ★イネ定義：種類数（diversity）
+        "family_count": int(len(families_set)),
+
+        # ユニーク集合
+        "family_set": ",".join(sorted(families_set))
     }
     pd.DataFrame([summary]).to_csv(out_summary, sep="\t", index=False)
 
