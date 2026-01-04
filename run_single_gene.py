@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Run GCIC pipeline for a single gene extracted from a large multi-FASTA.
+"""
+Run GCIC pipeline for a single gene extracted from a large multi-FASTA.
 
 Outputs:
 - results/per_gene/<GENE_ID>/* (per-gene outputs)
 - results/all_genes_gcic_summary.tsv (single-row summary; OVERWRITTEN each run)
+
+Key change (align with rice definition/output):
+- Do NOT compute summary here.
+- Read results/per_gene/<GENE_ID>/gene_gcic_summary.tsv produced by GCIC_pipeline.py
+  and write results/all_genes_gcic_summary.tsv with rice-compatible columns.
 """
 
 import argparse
@@ -17,6 +23,18 @@ import csv
 
 DEFAULT_MOTIFS = "resources/motifs.txt"
 DEFAULT_FAMILY_MAP = "resources/family_map.tsv"
+
+SUMMARY_COLS = [
+    "gene_id",
+    "chrom",
+    "region_start",
+    "region_end",
+    "has_gcic",
+    "gcic_motif_family_count",
+    "gcic_total_bp",
+    "family_count",
+    "family_set",
+]
 
 
 def run(cmd):
@@ -67,6 +85,51 @@ def write_single_fasta(out_path: Path, gene_id: str, seq: str):
     out_path.write_text(f">{gene_id}\n{seq}\n")
 
 
+def normalize_has_gcic(val) -> str:
+    """Return 'TRUE'/'FALSE' for rice-compatible output."""
+    if isinstance(val, bool):
+        return "TRUE" if val else "FALSE"
+    s = str(val).strip()
+    if s.lower() in {"true", "1", "t", "yes"}:
+        return "TRUE"
+    return "FALSE"
+
+
+def read_gene_summary(summary_path: Path) -> dict:
+    """Read gene_gcic_summary.tsv and normalize to SUMMARY_COLS."""
+    if not summary_path.exists() or summary_path.stat().st_size == 0:
+        raise RuntimeError(f"Missing per-gene summary: {summary_path}")
+
+    df = pd.read_csv(summary_path, sep="\t")
+    if df.empty:
+        raise RuntimeError(f"Empty per-gene summary: {summary_path}")
+
+    row = df.iloc[0].to_dict()
+
+    # Validate required columns
+    missing = [c for c in SUMMARY_COLS if c not in row]
+    if missing:
+        raise RuntimeError(
+            f"Per-gene summary missing columns {missing}. "
+            f"Found columns: {list(df.columns)}"
+        )
+
+    out = {k: row.get(k, "") for k in SUMMARY_COLS}
+    out["has_gcic"] = normalize_has_gcic(out["has_gcic"])
+
+    # Make ints where appropriate (safe)
+    for k in ("region_start", "region_end", "gcic_motif_family_count", "gcic_total_bp", "family_count"):
+        try:
+            out[k] = int(out[k])
+        except Exception:
+            pass
+
+    if pd.isna(out.get("family_set")):
+        out["family_set"] = ""
+
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--species", choices=["rice", "arabidopsis"], required=True)
@@ -96,7 +159,7 @@ def main():
         raise RuntimeError(f"Gene {gene_id} not found in BED: {args.bed}")
     chrom, region_start, region_end = coords[gene_id]
 
-    # Extract and write per-gene FASTA (input for pipeline)
+    # Extract and write per-gene FASTA
     seq = extract_gene_fasta(args.master_fasta, gene_id)
     gene_fa = per_gene / f"{gene_id}.fa"
     write_single_fasta(gene_fa, gene_id, seq)
@@ -122,33 +185,20 @@ def main():
 
     run(cmd)
 
-    # Build summary from GCIC.islands.multi.tsv
-    islands_multi = per_gene / "GCIC.islands.multi.tsv"
-    families = set()
-    total_bp = 0
-    if islands_multi.exists() and islands_multi.stat().st_size > 0:
-        df = pd.read_csv(islands_multi, sep="\t")
-        if "family" in df.columns:
-            families = set(df["family"].dropna().astype(str))
-        if "start" in df.columns and "end" in df.columns:
-            total_bp = int((df["end"] - df["start"]).clip(lower=0).sum())
+    # Read per-gene summary produced by GCIC_pipeline.py
+    per_gene_summary = per_gene / "gene_gcic_summary.tsv"
+    row = read_gene_summary(per_gene_summary)
 
+    # Write rice-compatible all_genes_gcic_summary.tsv (OVERWRITE each run)
     summary_path = out_root / "all_genes_gcic_summary.tsv"
-    row = {
-        "gene_id": gene_id,
-        "species": species,
-        "chrom": chrom,
-        "region_start": region_start,
-        "region_end": region_end,
-        "n_families": len(families),
-        "total_island_bp": total_bp
-    }
-
-    # 重要：毎回上書き（溜めない）
     with open(summary_path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(row.keys()), delimiter="\t")
+        w = csv.DictWriter(f, fieldnames=SUMMARY_COLS, delimiter="\t")
         w.writeheader()
         w.writerow(row)
+
+    print("[INFO] Done.")
+    print(f"[INFO] per-gene: {per_gene}")
+    print(f"[INFO] summary:  {summary_path}")
 
 
 if __name__ == "__main__":
