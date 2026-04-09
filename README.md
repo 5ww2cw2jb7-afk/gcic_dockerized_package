@@ -6,6 +6,15 @@ reproducibility across operating systems.
 
 ---
 
+## Associated Paper
+
+This repository accompanies the following paper:
+
+**"Gene-centered identification of cis-regulatory islands highlights regulatory landscapes complementary to motif-centric approaches"**  
+*BMC Genomics, 2026 (accepted)*
+
+---
+
 ## Overview
 
 - Interactive Shiny application (R)
@@ -26,8 +35,7 @@ Docker Desktop must be running before executing the commands below.
 ### Build and Run
 
 ```bash
-docker compose build --no-cache
-docker compose up -d
+docker compose up --build -d
 ```
 
 Open the application in a web browser:
@@ -80,7 +88,9 @@ repository root directory before running the application.
 
 The FASTA and BED files required to run this application are available on Zenodo:
 
-https://doi.org/10.5281/zenodo.18111654
+[Zenodo dataset (FASTA/BED files)](https://doi.org/10.5281/zenodo.18111654)
+
+Please download and place them in the repository root directory before running the application.
 
 ---
 
