@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software in your research, please cite it."
+message: "If you use this software in your research, please cite our paper."
 
 title: "GCIC: Dockerized Shiny application for GCIC analysis"
 
@@ -8,7 +8,7 @@ authors:
     given-names: Yoshihiro
 
 version: "1.0.0"
-date-released: 2025-12-31
+date-released: 2026-04-09
 
 repository-code: "https://github.com/5ww2cw2jb7-afk/gcic_dockerized_package"
 
@@ -17,4 +17,14 @@ license: MIT
 identifiers:
   - type: doi
     value: "10.5281/zenodo.18111654"
-    description: "Input FASTA and BED files for GCIC analysis"
+    description: "Dataset for GCIC analysis"
+
+preferred-citation:
+  type: article
+  title: "Gene-centered identification of cis-regulatory islands highlights regulatory landscapes complementary to motif-centric approaches"
+  authors:
+    - family-names: Ohmori
+      given-names: Yoshihiro
+  journal: "BMC Genomics"
+  year: 2026
+  note: "Accepted for publication"
