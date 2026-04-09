@@ -68,29 +68,22 @@ http://localhost:3838/gcic/
 
 ---
 
-## Data Files
+## Input Data (FASTA/BED)
 
 This repository does not include large input data files.
 
-Required input FASTA and BED files (examples):
+The FASTA and BED files required to run this application are available on Zenodo:
+
+[Zenodo dataset (FASTA/BED files)](https://doi.org/10.5281/zenodo.18111654)
+
+Example file names:
 
 - gene_regions.5prime.fa
 - gene_regions.bed
 - ATgene_regions.5prime.fa
 - ATgene_regions.bed
 
-Please download these files from Zenodo (see below) and place them in the
-repository root directory before running the application.
-
----
-
-## Input data (FASTA/BED)
-
-The FASTA and BED files required to run this application are available on Zenodo:
-
-[Zenodo dataset (FASTA/BED files)](https://doi.org/10.5281/zenodo.18111654)
-
-Please download and place them in the repository root directory before running the application.
+Please download these files and place them in the repository root directory before running the application.
 
 ---
 
