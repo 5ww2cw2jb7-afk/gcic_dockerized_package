@@ -111,7 +111,9 @@ Nucleic Acids Research, 27(1), 297–300.
 
 ## License
 
-This software is released under the MIT License.
+This software is available for academic and non-commercial use only.
+Commercial use requires prior written permission from the author.
+See the LICENSE file for details.
 
 ---
 
