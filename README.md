@@ -12,6 +12,7 @@ This repository accompanies the following paper:
 
 **"Gene-centered identification of cis-regulatory islands highlights regulatory landscapes complementary to motif-centric approaches"**  
 *BMC Genomics, 2026 (accepted)*
+https://doi.org/10.1186/s12864-026-12846-0
 
 ---
 
